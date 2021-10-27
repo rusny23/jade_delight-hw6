@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<style type="text/css">
+	.errMsg {color: #D20E11; border: solid 1px #d20e11; display:none;  padding: 1px 15px;	}
+</style>
+
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 5.25),
+	new MenuItem("Moo Shi Chicken", 6.5),
+	new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>"; 
+	return t;
+}
+</script>
+
+<h1>Jade Delight</h1>
+
+<form 
+name = "data"
+method="post"
+onsubmit="return validate()" 
+>
+
+<p>First Name: <input type="text"  name='fname' /></p>
+<p>Last Name*:  <input type="text"  name='lname' /></p>
+<div id="errLname" class="errMsg">Name is required</div><br/>
+<p>Street: <input type="text"  name='street' id='street' /></p>
+<p>City: <input type="text"  name='city' id='city' /></p>
+<p>Phone*: <input type="text"  name='phone' /></p>
+<div id="errPhone" class="errMsg">Name is required</div><br/>
+<p> 
+	<input type="radio"  name="p_or_d" value = "pickup" checked="checked"/>Pickup  
+	<input type="radio"  name='p_or_d' value = 'delivery'/>
+	Delivery
+</p>
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+
+<script language="javascript">
+
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+	  s += "<tr><td>";
+	  s += makeSelect("quan" + i, 0, 10);
+	  s += "</td><td>" + menuItems[i].name + "</td>";
+	  s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+	  s += "<td>$<input type='text' name='cost'/></td></tr>";
+  }
+  document.writeln(s);
+</script>
+
+</table>
+<p>Subtotal: 
+   $<input type="text"  name='subtotal' id="subtotal" />
+</p>
+<p>Mass tax 6.25%:
+  $ <input type="text"  name='tax' id="tax" />
+</p>
+<p>Total: $ <input type="text"  name='total' id="total" />
+</p>
+
+<input type = "button" value = "Submit Order" />
+
+<script language="javascript">
+
+    $('#street').hide();
+	$('#city').hide();
+
+	$(document).ready(function(){
+		function calcCost(quan, cost, index) {
+			itemCost = quan * cost;
+			document.getElementsByName('cost')[index].value = itemCost;
+			var subtotal = parseInt(document.getElementById('subtotal').value, 10); 
+			subtotal += itemCost;
+			document.getElementById('subtotal').value = subtotal;
+			var tax = parseInt(document.getElementById('tax').value, 10); 
+			tax = (subtotal* 0.625);
+			document.getElementById('tax').value = tax;
+			var total = parseInt(document.getElementById('total').value, 10);
+			total = subtotal + tax;
+			document.getElementById('total').value = total;
+		}
+
+		$('select').change(function(){
+			var id = this.name[4];//this.name is the name attribute of that selected item; returns "x" in the string of quan"x"
+			calcCost(this.value,menuItems[id].cost,id);
+		});
+
+		$('input[type="radio"]').click(function() {
+			var inputValue = $(this).attr("value");
+			if (inputValue == "pickup") {
+				$('#street').hide();//document.get
+				$('#city').hide();
+			}
+			else {
+				$('#street').show();//document.get
+				$('#city').show();
+			}
+		});
+
+	})
+
+	function validate()
+		{
+			err=false;
+			document.getElementById("errPhone").style.display = "none";
+			document.getElementById("errLname").style.display = "none";
+			with (document.data)
+			{
+				if (phone.value=="")
+				{
+					document.getElementById("errPhone").style.display = "inline-block";
+					phone.focus();
+					err=true;
+				}
+				if (name.value=="")
+				{
+					document.getElementById("errLname").style.display = "inline-block";
+					name.focus();
+					err=true;
+				}
+			}
+			return !err;
+		}
+
+	
+</script>
+
+</form>
+</body>
+</html>
